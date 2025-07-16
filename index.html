@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calls and Appointments Tracker</title>
     <style>
+        .green {
+            background: #64ea64;
+        }
+
+        .red {
+            background: #ff7d7d;
+        }
+
         .checkbox-wrapper-40 {
             --borderColor: #48c;
             --borderWidth: .125em;
@@ -76,7 +84,7 @@
         div#info-sidebar,
         div#sidebar {
             color: black;
-            z-index:  9;
+            z-index: 9;
         }
 
         .button-89 {
@@ -218,7 +226,6 @@
             width: 300px;
             height: 100%;
             background: #f0f0f0;
-            padding: 20px;
             transition: all 0.3s;
             overflow-y: auto;
         }
@@ -258,11 +265,14 @@
             margin-bottom: 15px;
             border-bottom: 1px solid #ccc;
             padding-bottom: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
         }
 
         .total {
             font-weight: bold;
             margin-top: 20px;
+            padding: 1rem;
         }
 
         .info-section {
@@ -287,30 +297,29 @@
         }
 
         #restore-button {
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ff5e5e;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    z-index: 1001;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    transition: background 0.3s;
-}
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff5e5e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 1001;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s;
+        }
 
-#restore-button:hover {
-    background-color: #ff3c3c;
-}
-
+        #restore-button:hover {
+            background-color: #ff3c3c;
+        }
     </style>
 </head>
 
 <body>
- <div id="restore-button" onclick="resetCounters()">Restore</div>
+    <div id="restore-button" onclick="resetCounters()">Restore</div>
 
     <button class="sidebar-toggle" onclick="toggleSidebar()">☰ History</button>
     <button class="info-sidebar-toggle" onclick="toggleInfoSidebar()">☰ Info</button>
@@ -518,11 +527,16 @@
                     Appointments: ${item.appointments}<br>
                     Result: ${item.result}%
                 `;
+                item.result >= 55 ? div.classList.add("green") : div.classList.add("red")
+
                 historyList.appendChild(div);
+
             });
 
             const totalResult = totalCalls > 0 ? (totalAppointments / totalCalls * 100).toFixed(2) : 0;
             document.getElementById('total-result').textContent = `Total Result: ${totalResult}% (Calls: ${totalCalls}, Appointments: ${totalAppointments})`;
+            totalResult >= 55 ? document.getElementById('total-result').classList.add("green") : document.getElementById('total-result').classList.add("red")
+
         }
 
         function toggleSidebar() {
@@ -578,19 +592,19 @@
             reader.readAsText(file);
         }
 
-function resetCounters() {
-    calls = 0;
-    appointments = 0;
+        function resetCounters() {
+            calls = 0;
+            appointments = 0;
 
-    localStorage.setItem('currentCalls', 0);
-    localStorage.setItem('currentAppointments', 0);
+            localStorage.setItem('currentCalls', 0);
+            localStorage.setItem('currentAppointments', 0);
 
-    document.getElementById('calls-display').textContent = calls;
-    document.getElementById('appointments-display').textContent = appointments;
-    calculateResult();
+            document.getElementById('calls-display').textContent = calls;
+            document.getElementById('appointments-display').textContent = appointments;
+            calculateResult();
 
-    alert('Counters reset! You’re starting fresh. 🚀');
-}
+            alert('Counters reset! You’re starting fresh. 🚀');
+        }
 
 
     </script>
