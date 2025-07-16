@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calls and Appointments Tracker</title>
+    <style>
+        .checkbox-wrapper-40 {
+            --borderColor: #48c;
+            --borderWidth: .125em;
+            position: relative;
+            margin-top: 2rem;
+            max-width: 80%;
+        }
+
+        .checkbox-wrapper-40 label {
+            display: block;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .checkbox-wrapper-40 input[type=checkbox] {
+            -webkit-appearance: none;
+            appearance: none;
+            vertical-align: middle;
+            background: #fff;
+            font-size: 1.8em;
+            border-radius: 0.125em;
+            display: inline-block;
+            border: var(--borderWidth) solid var(--borderColor);
+            width: 1em;
+            height: 1em;
+            position: relative;
+        }
+
+        .checkbox-wrapper-40 input[type=checkbox]:before,
+        .checkbox-wrapper-40 input[type=checkbox]:after {
+            content: "";
+            position: absolute;
+            background: var(--borderColor);
+            width: calc(var(--borderWidth) * 3);
+            height: var(--borderWidth);
+            top: 50%;
+            left: 10%;
+            transform-origin: left center;
+        }
+
+        .checkbox-wrapper-40 input[type=checkbox]:before {
+            transform: rotate(45deg) translate(calc(var(--borderWidth) / -2), calc(var(--borderWidth) / -2)) scaleX(0);
+            transition: transform 200ms ease-in 200ms;
+        }
+
+        .checkbox-wrapper-40 input[type=checkbox]:after {
+            width: calc(var(--borderWidth) * 5);
+            transform: rotate(-45deg) translateY(calc(var(--borderWidth) * 2)) scaleX(0);
+            transform-origin: left center;
+            transition: transform 200ms ease-in;
+        }
+
+        .checkbox-wrapper-40 input[type=checkbox]:checked:before {
+            transform: rotate(45deg) translate(calc(var(--borderWidth) / -2), calc(var(--borderWidth) / -2)) scaleX(1);
+            transition: transform 200ms ease-in;
+        }
+
+        .checkbox-wrapper-40 input[type=checkbox]:checked:after {
+            width: calc(var(--borderWidth) * 5);
+            transform: rotate(-45deg) translateY(calc(var(--borderWidth) * 2)) scaleX(1);
+            transition: transform 200ms ease-out 200ms;
+        }
+
+        .checkbox-wrapper-40 input[type=checkbox]:focus {
+            outline: calc(var(--borderWidth) / 2) dotted rgba(0, 0, 0, 0.25);
+        }
+
+        div#info-sidebar,
+        div#sidebar {
+            color: black;
+            z-index:  9;
+        }
+
+        .button-89 {
+            --b: 3px;
+            /* border thickness */
+            --s: .45em;
+            /* size of the corner */
+            --color: white;
+
+            padding: calc(.5em + var(--s)) calc(.9em + var(--s));
+            color: var(--color);
+            --_p: var(--s);
+            background:
+                conic-gradient(from 90deg at var(--b) var(--b), #0000 90deg, var(--color) 0) var(--_p) var(--_p)/calc(100% - var(--b) - 2*var(--_p)) calc(100% - var(--b) - 2*var(--_p));
+            transition: .3s linear, color 0s, background-color 0s;
+            outline: var(--b) solid #0000;
+            outline-offset: .6em;
+            font-size: 16px;
+
+            border: 0;
+
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .button-89:hover,
+        .button-89:focus-visible {
+            --_p: 0px;
+            outline-color: var(--color);
+            outline-offset: .05em;
+        }
+
+        .button-89:active {
+            background: var(--color);
+            color: #fff;
+        }
+
+        .section-1 {
+            border-bottom: 1px solid white;
+            padding-bottom: 2rem;
+        }
+
+        .history-button {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 3rem;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 40px;
+            overflow-x: hidden;
+            background-color: #222831;
+            color: white;
+        }
+
+        .section {
+            flex: 1;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            margin: 2rem 4rem;
+        }
+
+        label {
+            display: inline-block;
+            width: 120px;
+        }
+
+        .counter-section {
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .counter-display {
+            font-size: 100px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .counter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .counter-buttons button {
+            background: white;
+            color: #222831;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .counter-buttons button:hover {
+            background: #e0dcdc;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 3rem;
+        }
+
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .sidebar,
+        .info-sidebar {
+            position: fixed;
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background: #f0f0f0;
+            padding: 20px;
+            transition: all 0.3s;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            left: -400px;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .info-sidebar {
+            right: -400px;
+        }
+
+        .info-sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-toggle,
+        .info-sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            z-index: 1000;
+        }
+
+        .sidebar-toggle {
+            left: 10px;
+        }
+
+        .info-sidebar-toggle {
+            right: 10px;
+        }
+
+        .history-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .total {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-content {
+            display: none;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .info-section input[type="checkbox"]:checked~.info-content {
+            display: block;
+        }
+
+        .checkbox-wrapper-40 p {
+            position: absolute;
+            top: -14px;
+            left: 49%;
+            font-size: 1.2rem;
+        }
+
+        #restore-button {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff5e5e;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 1001;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: background 0.3s;
+}
+
+#restore-button:hover {
+    background-color: #ff3c3c;
+}
+
+    </style>
+</head>
+
+<body>
+ <div id="restore-button" onclick="resetCounters()">Restore</div>
+
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰ History</button>
+    <button class="info-sidebar-toggle" onclick="toggleInfoSidebar()">☰ Info</button>
+
+    <div class="sidebar" id="sidebar">
+        <h2>History</h2>
+        <button onclick="clearHistory()">Clear History</button>
+        <div id="history-list"></div>
+        <div class="total" id="total-result"></div>
+    </div>
+
+    <div class="info-sidebar" id="info-sidebar">
+        <h2>Booking Information</h2>
+        <div class="info-section">
+            <input type="checkbox" id="burjeel-najda">
+            <label for="burjeel-najda">Burjeel Najda</label>
+            <div class="info-content">
+                <p><strong>Booking Daman Basic Cardholders at Burjeel Najda:</strong></p>
+                <p><strong>Daman Basic Exclusions:</strong> Appointments for Daman Basic cardholders are subject to the
+                    following exclusions:</p>
+                <ul>
+                    <li>Elderly Patients: Individuals aged 60 years and above.</li>
+                    <li>Follow-up Visits: Appointments scheduled within a 7-day period from the previous visit.</li>
+                    <li>Post-surgical Patients: Patients who have recently undergone surgical procedures. Please check
+                        SAP for recent surgical details if not expressly provided by the patient.</li>
+                    <li>Expectant Mothers: Patients receiving care under Gynecology or Obstetrics.</li>
+                    <li>Oncology and Dialysis Patients: Individuals undergoing active cancer treatment or regular
+                        dialysis sessions.</li>
+                    <li>Thiqa Household Dependents: Nannies, personal assistants, drivers, or extended family members
+                        residing with a Thiqa cardholder.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="info-section">
+            <input type="checkbox" id="burjeel-al-ain">
+            <label for="burjeel-al-ain">Burjeel Royal Al-Ain</label>
+            <div class="info-content">
+                <p><strong>Appointment Timing & Prioritization for Daman Basic Cardholders:</strong></p>
+                <p><strong>Weekday Appointments (Monday to Thursday):</strong></p>
+                <ul>
+                    <li>Time Frame 1: 07:00 AM to 09:00 AM (any day)</li>
+                    <li>Time Frame 2: 07:00 PM to 11:00 PM (any day)</li>
+                    <li>Action: Appointments for Basic cardholders can be scheduled during these hours.</li>
+                    <li>Note: Appointments should not be booked for Basic cardholders on weekdays outside these time
+                        frames unless they meet the specific exclusion criteria (elderly, G&O, chronic patients, etc. as
+                        listed for Burjeel Najda).</li>
+                </ul>
+                <p><strong>Weekend Bookings (Friday to Sunday):</strong></p>
+                <ul>
+                    <li>Action: You can book Daman Basic cardholders at any time during the entire weekend (Friday,
+                        Saturday, and Sunday).</li>
+                </ul>
+            </div>
+        </div>
+        <div class="info-section">
+            <input type="checkbox" id="burjeel-shamkha">
+            <label for="burjeel-shamkha">Burjeel Shamkha & Shahama</label>
+            <div class="info-content">
+                <p><strong>Requirement:</strong> The patient must have visited the medical centers within the last 3
+                    months. If not, an appointment cannot be booked.</p>
+                <p><strong>Note:</strong> Check UAP / SAP to obtain full records of past visits.</p>
+            </div>
+        </div>
+        <div class="info-section">
+            <input type="checkbox" id="important-notes">
+            <label for="important-notes">Important Notes</label>
+            <div class="info-content">
+                <p><strong>Important Notes for All Burjeel Locations:</strong></p>
+                <ul>
+                    <li>If none of the above criteria are met, an alternative hospital should be offered before
+                        informing the patient of appointment unavailability.</li>
+                    <li>Daman Basic cardholders must obtain a referral from a General Practitioner (GP) before visiting
+                        any specialist.</li>
+                    <li>Exceptions to Referral Requirement: Pediatrics, Geriatrics, and Gynecology doctors.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="section section-1">
+        <h2>Calls & Appointments</h2>
+        <div class="counter-section">
+            <div class="input-group" id="appointments-group">
+                <label for="appointments">Appointments:</label>
+                <div class="counter-buttons">
+                    <button onclick="changeValue('appointments', -1)">-</button>
+                    <div class="counter-display" id="appointments-display">0</div>
+                    <button onclick="changeValue('appointments', 1)">+</button>
+                </div>
+            </div>
+            <div class="input-group" id="calls-group">
+                <label for="calls">Calls:</label>
+                <div class="counter-buttons">
+                    <button onclick="changeValue('calls', -1)">-</button>
+                    <div class="counter-display" id="calls-display">0</div>
+                    <button onclick="changeValue('calls', 1)">+</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="result" id="result">Result: 0%</div>
+        <div class="history-button">
+            <button onclick="addToHistory()" class="history button-89">Add to History</button>
+
+        </div>
+    </div>
+
+    <div class="section ">
+        <h2>Tricks Reminder</h2>
+        <div class="checkbox-wrapper-40">
+            <label>
+                <input type="checkbox" />
+                <span class="checkbox"></span>
+                <p>1-Offer follow up</p>
+            </label>
+        </div>
+        <div class="checkbox-wrapper-40">
+            <label>
+                <input type="checkbox" />
+                <span class="checkbox"></span>
+                <p>2-Book for daman basic</p>
+
+            </label>
+        </div>
+        <div class="checkbox-wrapper-40">
+            <label>
+                <input type="checkbox" />
+                <span class="checkbox"></span>
+                <p>3-secure appointment for walk-ins</p>
+
+            </label>
+        </div>
+        <button onclick="exportHistory()">Export History</button>
+        <input type="file" accept=".json" onchange="importHistory(event)">
+
+    </div>
+
+    <script>
+        let calls = 0;
+        let appointments = 0;
+
+        calls = parseInt(localStorage.getItem('currentCalls')) || 0;
+        appointments = parseInt(localStorage.getItem('currentAppointments')) || 0;
+
+        function changeValue(type, delta) {
+            if (type === 'calls') {
+                calls = Math.max(0, calls + delta);
+                document.getElementById('calls-display').textContent = calls;
+            } else if (type === 'appointments') {
+                appointments = Math.max(0, appointments + delta);
+                document.getElementById('appointments-display').textContent = appointments;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('currentCalls', calls);
+            localStorage.setItem('currentAppointments', appointments);
+
+            calculateResult();
+        }
+
+
+        function calculateResult() {
+            const result = calls > 0 ? (appointments / calls * 100).toFixed(2) : 0;
+            document.getElementById('result').textContent = `Result: ${result}%`;
+        }
+
+        function addToHistory() {
+            const date = new Date().toLocaleDateString();
+            const result = calls > 0 ? (appointments / calls * 100).toFixed(2) : 0;
+
+            let history = JSON.parse(localStorage.getItem('history') || '[]');
+            const existingIndex = history.findIndex(item => item.date === date);
+
+            if (existingIndex !== -1) {
+                // Update existing entry
+                history[existingIndex] = { date, calls, appointments, result };
+            } else {
+                // Add new entry
+                history.push({ date, calls, appointments, result });
+            }
+            localStorage.setItem('history', JSON.stringify(history));
+
+            updateHistoryDisplay();
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('history');
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const history = JSON.parse(localStorage.getItem('history') || '[]');
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = '';
+
+            let totalCalls = 0, totalAppointments = 0;
+            history.forEach(item => {
+                totalCalls += item.calls;
+                totalAppointments += item.appointments;
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <strong>${item.date}</strong><br>
+                    Calls: ${item.calls}<br>
+                    Appointments: ${item.appointments}<br>
+                    Result: ${item.result}%
+                `;
+                historyList.appendChild(div);
+            });
+
+            const totalResult = totalCalls > 0 ? (totalAppointments / totalCalls * 100).toFixed(2) : 0;
+            document.getElementById('total-result').textContent = `Total Result: ${totalResult}% (Calls: ${totalCalls}, Appointments: ${totalAppointments})`;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function toggleInfoSidebar() {
+            const infoSidebar = document.getElementById('info-sidebar');
+            infoSidebar.classList.toggle('open');
+        }
+
+        // Initialize display
+        document.getElementById('calls-display').textContent = calls;
+        document.getElementById('appointments-display').textContent = appointments;
+        calculateResult();
+        updateHistoryDisplay();
+
+        const history = localStorage.getItem('history') || '[]';
+
+        function exportHistory() {
+            const history = localStorage.getItem('history') || '[]';
+            const blob = new Blob([history], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'history.json';
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
+
+        function importHistory(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        localStorage.setItem('history', JSON.stringify(importedData));
+                        updateHistoryDisplay();
+                        alert('History imported successfully.');
+                    } else {
+                        alert('Invalid format: must be an array.');
+                    }
+                } catch (err) {
+                    alert('Failed to import: invalid JSON.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+function resetCounters() {
+    calls = 0;
+    appointments = 0;
+
+    localStorage.setItem('currentCalls', 0);
+    localStorage.setItem('currentAppointments', 0);
+
+    document.getElementById('calls-display').textContent = calls;
+    document.getElementById('appointments-display').textContent = appointments;
+    calculateResult();
+
+    alert('Counters reset! You’re starting fresh. 🚀');
+}
+
+
+    </script>
+
+
+</body>
+
+</html>
