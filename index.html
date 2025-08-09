@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calls and Appointments Tracker</title>
     <style>
+       div#bmc-sidebar >.info-section {
+            border-bottom: 1px solid black;
+            padding: 1rem;
+            border-top: 1px solid black;
+
+        }
+    .buttons-container {
+    position: fixed;
+    top: 1.2rem;
+    right: 98px;
+    z-index: 99;
+}
         .green {
             background: #64ea64;
         }
@@ -239,7 +251,8 @@
         }
 
         .info-sidebar {
-            right: -400px;
+            right: -75%;
+            width: 75%;
         }
 
         .info-sidebar.open {
@@ -259,6 +272,61 @@
 
         .info-sidebar-toggle {
             right: 10px;
+        }
+
+        .bmc-button,
+        .dubai-button {
+       
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .bmc-button:hover,
+        .dubai-button:hover {
+            background-color: #45a049;
+        }
+
+        .bmc-button {
+            right: 80px;
+        }
+
+        .dubai-button {
+            right: 150px;
+        }
+
+        .bmc-sidebar,
+        .dubai-sidebar {
+            position: fixed;
+            top: 0;
+            width: 75%;
+            height: 100%;
+            background: #f0f0f0;
+            transition: all 0.3s;
+            overflow-y: auto;
+            color: black;
+            z-index: 9;
+        }
+
+        .bmc-sidebar {
+            right: -75%;
+        }
+
+        .bmc-sidebar.open {
+            right: 0;
+        }
+
+        .dubai-sidebar {
+            right: -75%;
+        }
+
+        .dubai-sidebar.open {
+            right: 0;
         }
 
         .history-item {
@@ -289,6 +357,11 @@
             display: block;
         }
 
+        .info-section input[type="checkbox"] {
+            transform: scale(2);
+            margin: 1rem;
+        }
+
         .checkbox-wrapper-40 p {
             position: absolute;
             top: -14px;
@@ -315,6 +388,74 @@
         #restore-button:hover {
             background-color: #ff3c3c;
         }
+
+        .info-section label {
+            font-size: 22px;
+            width: 84%;
+        }
+
+        .dental-doctor-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 5px solid #4CAF50;
+            color: #333;
+        }
+
+        .doctor-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .specialization {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .booking-rules {
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dental-quick-select {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #4CAF50;
+        }
+
+        .dental-quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: #45a049;
+        }
     </style>
 </head>
 
@@ -322,7 +463,12 @@
     <div id="restore-button" onclick="resetCounters()">Restore</div>
 
     <button class="sidebar-toggle" onclick="toggleSidebar()">☰ History</button>
-    <button class="info-sidebar-toggle" onclick="toggleInfoSidebar()">☰ Info</button>
+    <div class="buttons-container">
+        <button class="info-sidebar-toggle" onclick="toggleInfoSidebar()">☰ Info</button>
+        <button class="bmc-button" onclick="openBMC()"> Bmc </button>
+        <button class="dubai-button" onclick="openDubai()">Dubai</button>
+    </div>
+
 
     <div class="sidebar" id="sidebar">
         <h2>History</h2>
@@ -399,6 +545,749 @@
         </div>
     </div>
 
+    <div class="bmc-sidebar" id="bmc-sidebar">
+        <h2>BMC</h2>
+
+        <!-- Main Dental Checkbox -->
+        <div class="info-section">
+            <input type="checkbox" id="main-dental-checkbox" onchange="toggleDentalDoctors()">
+            <label for="main-dental-checkbox">🦷 Dental</label>
+            <div class="info-content">
+                <p><strong>Dental Services:</strong> Select this to view available doctors and their specializations.
+                </p>
+            </div>
+        </div>
+
+        <!-- Doctor Selection Section (Hidden by default) -->
+        <div id="dental-doctors-section" style="display: none;">
+            <h3 style="text-align: center; color: #4CAF50; margin: 20px 0;">Select a Doctor:</h3>
+
+            <div class="info-section">
+                <input type="checkbox" id="dr-thomas">
+                <label for="dr-thomas">Dr. Thomas George Arayathinal</label>
+                <div class="info-content">
+                    <p><strong>Specialization:</strong> Maxillofacial Surgery</p>
+                    <p><strong>Booking Rules:</strong></p>
+                    <ul>
+                        <li><span style="color: #ff5e5e; font-weight: bold;">❌ NO OVERBOOKING</span></li>
+                        <li><span style="color: #4CAF50;">✅ Maxillofacial cases ONLY</span></li>
+                        <li><span style="color: #4CAF50;">✅ Maximum 2 surgeries per day</span></li>
+                        <li><span style="color: #ffa500;">⚠️ Urgent appointments: Send ticket to clinic with remark
+                                "NEED APP"</span></li>
+                </ul>
+                    <div style="background: #f0f8ff; padding: 10px; margin: 10px 0; border-left: 4px solid #4CAF50;">
+                        <strong>Note:</strong> This doctor handles complex maxillofacial surgical procedures only.
+            </div>
+        </div>
+            </div>
+
+        <div class="info-section">
+                <input type="checkbox" id="dr-tahir">
+                <label for="dr-tahir">Dr. Tahir Mirza</label>
+            <div class="info-content">
+                    <p><strong>Specialization:</strong> Maxillofacial Surgery</p>
+                    <p><strong>Booking Rules:</strong></p>
+                    <ul>
+                        <li><span style="color: #ff5e5e; font-weight: bold;">❌ NO OVERBOOKING</span></li>
+                        <li><span style="color: #4CAF50;">✅ Maxillofacial cases ONLY</span></li>
+                        <li><span style="color: #4CAF50;">✅ Walk-in patients: Send ticket to clinic</span></li>
+                </ul>
+                    <div style="background: #f0f8ff; padding: 10px; margin: 10px 0; border-left: 4px solid #4CAF50;">
+                        <strong>Note:</strong> Specializes in maxillofacial procedures with walk-in accommodation.
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <input type="checkbox" id="dr-zeinab-wael">
+                <label for="dr-zeinab-wael">Zeinab / Wael</label>
+                <div class="info-content">
+                    <p><strong>Specialization:</strong> General Dentistry</p>
+                    <p><strong>Services Available:</strong></p>
+                    <ul>
+                        <li><span style="color: #4CAF50;">✅ Teeth Whitening</span></li>
+                        <li><span style="color: #4CAF50;">✅ Dental Cleaning</span></li>
+                        <li><span style="color: #4CAF50;">✅ General Dental Procedures</span></li>
+                        <li><span style="color: #4CAF50;">✅ Routine Check-ups</span></li>
+                        <li><span style="color: #4CAF50;">✅ Preventive Care</span></li>
+                    </ul>
+                    <div style="background: #f0f8ff; padding: 10px; margin: 10px 0; border-left: 4px solid #4CAF50;">
+                        <strong>Note:</strong> General practice doctors handling routine dental care and cosmetic
+                        procedures.
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <input type="checkbox" id="dr-wujood">
+                <label for="dr-wujood">Wujood Ahmad Bakhid Ahmad Alfalasi</label>
+                <div class="info-content">
+                    <p><strong>Specialization:</strong> Orthodontics</p>
+                    <p><strong>Booking Rules:</strong></p>
+                    <ul>
+                        <li><span style="color: #4CAF50;">✅ Orthodontics cases ONLY</span></li>
+                        <li><span style="color: #4CAF50;">✅ Braces consultation and treatment</span></li>
+                        <li><span style="color: #4CAF50;">✅ Teeth alignment procedures</span></li>
+                        <li><span style="color: #4CAF50;">✅ Orthodontic follow-ups</span></li>
+                    </ul>
+                    <div style="background: #f0f8ff; padding: 10px; margin: 10px 0; border-left: 4px solid #4CAF50;">
+                        <strong>Note:</strong> Specialized in orthodontic treatments and teeth alignment procedures.
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Important Notes Section -->
+            <div class="info-section">
+                <input type="checkbox" id="dental-important-notes">
+                <label for="dental-important-notes">📋 Important Notes</label>
+                <div class="info-content">
+                    <h4 style="color: #d32f2f; margin-top: 0;">🏥 Thiqa Insurance Guidelines</h4>
+                    <div
+                        style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+                        <ul style="margin: 10px 0; line-height: 1.8;">
+                            <li><span style="color: #4CAF50; font-weight: bold;">✅ Thiqa 1/2: No need to check
+                                    insurance</span></li>
+                            <li><span style="color: #ffa500; font-weight: bold;">⚠️ Thiqa approval: Required every 6
+                                    months</span></li>
+                            <li><span style="color: #ff5e5e; font-weight: bold;">🎫 If insurance or approval not clear:
+                                    Send ticket to clinic</span></li>
+                        </ul>
+                    </div>
+
+                    <div
+                        style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+                        <h5 style="color: #2e7d32; margin-top: 0;">💡 Quick Reference:</h5>
+                        <p style="margin: 5px 0; font-size: 14px;"><strong>Thiqa 1/2:</strong> Direct booking allowed -
+                            no insurance verification needed</p>
+                        <p style="margin: 5px 0; font-size: 14px;"><strong>Thiqa Standard:</strong> Check approval
+                            validity (6-month renewal cycle)</p>
+                        <p style="margin: 5px 0; font-size: 14px;"><strong>Unclear Cases:</strong> Always send ticket to
+                            clinic for verification</p>
+                    </div>
+
+                    <div
+                        style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ffa500; margin: 15px 0;">
+                        <h5 style="color: #f57700; margin-top: 0;">⚡ Action Items:</h5>
+                        <ol style="margin: 10px 0; line-height: 1.6;">
+                            <li>Verify Thiqa type (1/2 vs Standard)</li>
+                            <li>Check approval expiry date if applicable</li>
+                            <li>Send clinic ticket if any doubts exist</li>
+                            <li>Document ticket number for follow-up</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End dental-doctors-section -->
+        <div class="info-section">
+            <input type="checkbox" id="bmc-radiology" onchange="toggleRadiologyServices()">
+            <label for="bmc-radiology">Radiology</label>
+            <div class="info-content">
+                <p><strong>BMC Radiology Services:</strong> Select this to view available imaging services and procedures.</p>
+                <P style="color:blue; font-size: 2rem; font-weight: bold;">Thiqa doesn't required approval unless it's with Contrast</P>
+            </div>
+        </div>
+        
+        <!-- Radiology Services Section (Hidden by default) -->
+        <div id="radiology-services-section" style="display: none;">
+            <h3 style="text-align: center; color: #2196F3; margin: 20px 0;">Select Imaging Service:</h3>
+        
+            <div class="info-section">
+                <input type="checkbox" id="mri-service">
+                <label for="mri-service">🧲 MRI (Magnetic Resonance Imaging)</label>
+                <div class="info-content">
+                    <h4 style="color: #1565c0; margin-top: 0;">📋 Ct scan Approval Steps</h4>
+                    
+                    <!-- Step 1: Check Services -->
+                    <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+                        <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Services</h5>
+                        <ol style="margin: 10px 0; line-height: 1.6;">
+                            <li><strong>Open EMR</strong></li>
+                            <li><strong>Select Services</strong></li>
+                            <li><strong>Look for MRI service at clinical order</strong></li>
+                            <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for the clinic of doctor that requested</span></li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Step 2: Check Approval -->
+                    <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+                        <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+                        <ol style="margin: 10px 0; line-height: 1.6;">
+                            <li><strong>From document: Check approval file near to service date</strong></li>
+                            <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for clinic</span></li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Important Questions -->
+                    <div style="background: #ffe6e6; padding: 15px; border-radius: 8px; border: 2px solid #ff5e5e; margin: 15px 0;">
+                        <h4 style="color: #d32f2f; margin-top: 0;">❓ Important Questions</h4>
+                        
+                        <!-- Without Contrast -->
+                        <div style="background: #e8f5e8; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #4CAF50;">
+                            <h6 style="color: #2e7d32; margin-top: 0;">🔍 MRI WITHOUT Contrast</h6>
+                            <p style="margin: 5px 0; font-weight: bold;">Ask: Any metals in body?</p>
+                            <ul style="margin: 8px 0; line-height: 1.5;">
+                                <li><span style="color: #ff5e5e; font-weight: bold;">YES → Raise ticket, DON'T book</span></li>
+                                <li><span style="color: #4CAF50; font-weight: bold;">NO → Book appointment</span></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- With Contrast -->
+                        <div style="background: #fff3e0; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffa500;">
+                            <h6 style="color: #f57700; margin-top: 0;">💉 MRI WITH Contrast</h6>
+                            <p style="margin: 5px 0; font-weight: bold;">Ask these 4 questions:</p>
+                            
+                            <div style="background: #fff; padding: 10px; border-radius: 4px; margin: 8px 0;">
+                                <p style="margin: 3px 0;"><strong>1. Any metals in body?</strong></p>
+                                <p style="margin: 3px 0; font-size: 14px;">
+                                    <span style="color: #ff5e5e;">YES → DON'T book</span> | 
+                                    <span style="color: #4CAF50;">NO → Continue to question 2</span>
+                                </p>
+                            </div>
+                            
+                            <div style="background: #fff; padding: 10px; border-radius: 4px; margin: 8px 0;">
+                                <p style="margin: 3px 0;"><strong>2. Creatinine test done?</strong></p>
+                                <p style="margin: 3px 0; font-size: 14px;">
+                                    <span style="color: #4CAF50;">YES → Continue to question 3</span>
+                                </p>
+                            </div>
+                            
+                            <div style="background: #fff; padding: 10px; border-radius: 4px; margin: 8px 0;">
+                                <p style="margin: 3px 0;"><strong>3. Diabetes medication?</strong></p>
+                                <p style="margin: 3px 0; font-size: 14px;">
+                                    <span style="color: #4CAF50;">Insulin → No problem</span><br>
+                                    <span style="color: #ffa500;">Tablets → Advise to stop 24 hours before MRI</span>
+                                </p>
+                            </div>
+                            
+                            <div style="background: #fff; padding: 10px; border-radius: 4px; margin: 8px 0;">
+                                <p style="margin: 3px 0;"><strong>4. Fasting required: 4-8 hours before scan</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session Information -->
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+                        <h5 style="color: #2e7d32; margin-top: 0;">⏱️ Session Information</h5>
+                        <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Session Time: 30-60 minutes</p>
+                    </div>
+                    
+                    <!-- Quick Reference Checklist -->
+                    <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; border: 2px solid #2196F3; margin: 15px 0;">
+                        <h5 style="color: #1565c0; margin-top: 0;">✅ Quick Checklist</h5>
+                        <ol style="margin: 10px 0; line-height: 1.6;">
+                            <li>✅ EMR service check completed</li>
+                            <li>✅ Approval document verified</li>
+                            <li>✅ Contrast type determined</li>
+                            <li>✅ Safety questions asked</li>
+                            <li>✅ Patient instructions given</li>
+                        </ol>
+                    </div>
+                </div>
+
+
+                <div class="info-section">
+                    <input type="checkbox" id="ct-service">
+                    <label for="ct-service">🩺 CT scan</label>
+                    <div class="info-content">
+                        <h4 style="color: #1565c0; margin-top: 0;">📋 MRI Approval Steps</h4>
+                        
+                        <!-- Step 1: Check Services -->
+                        <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+                            <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Services</h5>
+                            <ol style="margin: 10px 0; line-height: 1.6;">
+                                <li><strong>Open EMR</strong></li>
+                                <li><strong>Select Services</strong></li>
+                                <li><strong>Look for MRI service at clinical order</strong></li>
+                                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for the clinic of doctor that requested</span></li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Step 2: Check Approval -->
+                        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+                            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+                            <ol style="margin: 10px 0; line-height: 1.6;">
+                                <li><strong>From document: Check approval file near to service date</strong></li>
+                                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for clinic</span></li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Important Questions -->
+                        <div style="background: #ffe6e6; padding: 15px; border-radius: 8px; border: 2px solid #ff5e5e; margin: 15px 0;">
+                            <h4 style="color: #d32f2f; margin-top: 0;">❓ Important Questions</h4>
+                            
+                            <!-- Without Contrast -->
+                            <div style="background: #e8f5e8; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #4CAF50;">
+                                <h6 style="color: #2e7d32; margin-top: 0;">🔍 CT scan WITHOUT Contrast</h6>
+                                <p style="margin: 5px 0; font-weight: bold;">Book appointment directly</p>
+                                <ul style="margin: 8px 0; line-height: 1.5;">
+                                  
+                                </ul>
+                            </div>
+                            
+                            <!-- With Contrast -->
+                            <div style="background: #fff3e0; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffa500;">
+                                <h6 style="color: #f57700; margin-top: 0;">💉 Ct scan WITH Contrast</h6>
+                                <p style="margin: 5px 0; font-weight: bold;">Ask these 3 questions:</p>
+                                
+                          
+                                
+                                <div style="background: #fff; padding: 10px; border-radius: 4px; margin: 8px 0;">
+                                    <p style="margin: 3px 0;"><strong>1. Creatinine test done?</strong></p>
+                                    <p style="margin: 3px 0; font-size: 14px;">
+                                        <span style="color: #4CAF50;">YES → Continue to question 3</span>
+                                    </p>
+                                </div>
+                                
+                                <div style="background: #fff; padding: 10px; border-radius: 4px; margin: 8px 0;">
+                                    <p style="margin: 3px 0;"><strong>2. Diabetes medication?</strong></p>
+                                    <p style="margin: 3px 0; font-size: 14px;">
+                                        <span style="color: #4CAF50;">Insulin → No problem</span><br>
+                                        <span style="color: #ffa500;">Tablets → Advise to stop 24 hours before MRI</span>
+                                    </p>
+                                </div>
+                                
+                                <div style="background: #fff; padding: 10px; border-radius: 4px; margin: 8px 0;">
+                                    <p style="margin: 3px 0;"><strong>4. Fasting required: 4-8 hours before scan</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Session Information -->
+                        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+                            <h5 style="color: #2e7d32; margin-top: 0;">⏱️ Session Information</h5>
+                            <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Session Time: 30-60 minutes</p>
+                        </div>
+                        
+                        <!-- Quick Reference Checklist -->
+                        <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; border: 2px solid #2196F3; margin: 15px 0;">
+                            <h5 style="color: #1565c0; margin-top: 0;">✅ Quick Checklist</h5>
+                            <ol style="margin: 10px 0; line-height: 1.6;">
+                                <li>✅ EMR service check completed</li>
+                                <li>✅ Approval document verified</li>
+                                <li>✅ Contrast type determined</li>
+                                <li>✅ Safety questions asked</li>
+                                <li>✅ Patient instructions given</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- X-ray -->
+
+
+                <!--  flurscopy-->
+
+                
+                <div class="info-section">
+                    <input type="checkbox" id="ct-service">
+                    <label for="x-ray-service">🩺 X-ray</label>
+                    <div class="info-content">
+                        <h4 style="color: #1565c0; margin-top: 0;">📋 X-ray Approval Steps</h4>
+                        
+                        <!-- Step 1: Check Services -->
+                        <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+                            <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Services</h5>
+                            <ol style="margin: 10px 0; line-height: 1.6;">
+                                <li><strong>Open EMR</strong></li>
+                                <li><strong>Select Services</strong></li>
+                                <li><strong>Look for X-ray service at clinical order</strong></li>
+                                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for the clinic of doctor that requested</span></li>
+                                <li><span style="color: greenyellow; font-weight: bold;">no need to check approval for Thiqa</span></li>
+
+                            </ol>
+                        </div>
+                        
+                        <!-- Step 2: Check Approval -->
+                        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+                            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+                            <ol style="margin: 10px 0; line-height: 1.6;">
+                                <li><strong>From document: Check approval file near to service date</strong></li>
+                                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for clinic</span></li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Important Questions -->
+                            
+                            <!-- Without Contrast -->
+                            <div style="background: #e8f5e8; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #4CAF50;">
+                                <p style="margin: 5px 0; font-weight: bold;">Direct as walk-in</p>
+                                <ul style="margin: 8px 0; line-height: 1.5;">
+                                  
+                                </ul>
+                            </div>
+
+                          
+                            
+                
+                        
+                   
+                        
+                        <!-- Quick Reference Checklist -->
+                     
+                    </div>
+                </div>
+
+
+
+<!-- flurscopy -->
+
+        
+<div class="info-section">
+    <input type="checkbox" id="ct-service">
+    <label for="flurscopy-service">🩺 flurscopy</label>
+    <div class="info-content">
+        <h4 style="color: #1565c0; margin-top: 0;">📋 flurscopy Approval Steps</h4>
+        
+        <!-- Step 1: Check Services -->
+        <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+            <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Services</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>Open EMR</strong></li>
+                <li><strong>Select Services</strong></li>
+                <li><strong>Look for flurscopy service at clinical order</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for the clinic of doctor that requested</span></li>
+                <li><span style="color: greenyellow; font-weight: bold;">no need to check approval for Thiqa</span></li>
+
+            </ol>
+        </div>
+        
+        <!-- Step 2: Check Approval -->
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>From document: Check approval file near to service date</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for clinic</span></li>
+            </ol>
+        </div>
+        
+        <!-- Important Questions -->
+      
+            <!-- Without Contrast -->
+            <div style="background: #e8f5e8; padding: 12px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #4CAF50;">
+                <p style="margin: 3px 0;"><strong>4. Fasting required: 4-8 hours before scan</strong></p>
+                <p style="margin: 5px 0; font-weight: bold;">Book appointment directly</p>
+                <ul style="margin: 8px 0; line-height: 1.5;">
+                  
+                </ul>
+            </div>
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+                <h5 style="color: #2e7d32; margin-top: 0;">⏱️ Session Information</h5>
+                <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Session Time: 60 minutes</p>
+            </div>
+
+        
+   
+        
+        <!-- Quick Reference Checklist -->
+     
+    </div>
+</div>
+
+
+
+
+<div class="info-section">
+    <input type="checkbox" id="ct-service">
+    <label for="dexa-service">🩺 Dexa scan</label>
+    <div class="info-content">
+        <h4 style="color: #1565c0; margin-top: 0;">📋 Dexa Approval Steps</h4>
+        
+        <!-- Step 1: Check Services -->
+        <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+            <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Services</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>Open EMR</strong></li>
+                <li><strong>Select Services</strong></li>
+                <li><strong>Look for Dexa service at clinical order</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for the clinic of doctor that requested</span></li>
+                <li><span style="color: greenyellow; font-weight: bold;">no need to check approval for Thiqa</span></li>
+
+            </ol>
+        </div>
+        
+        <!-- Step 2: Check Approval -->
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>From document: Check approval file near to service date</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for clinic</span></li>
+            </ol>
+        </div>
+        
+        <!-- Important Questions -->
+      
+        
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+                <h5 style="color: #2e7d32; margin-top: 0;">⏱️ Session Information</h5>
+                <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Session Time: 60 minutes</p>
+            </div>
+    </div>
+</div>
+
+
+
+<div class="info-section">
+    <input type="checkbox" id="ct-service">
+    <label for="pet-service">🩺 Pet scan</label>
+    <div class="info-content">
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><span style="color: #ff5e5e; font-weight: bold;">ٌRaise Ticket to clinc</span></li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+<div class="info-section">
+    <input type="checkbox" id="u-s-b-service">
+    <label for="u-s-b-service">🩺Ultra sound breast</label>
+    <div class="info-content">
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><span style="color: #ff5e5e; font-weight: bold;">ٌRaise Ticket to clinc</span></li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="info-section">
+    <input type="checkbox" id="Mamogram-service">
+    <label for="🩺Mamogram-service">🩺Mamogram</label>
+    <div class="info-content">
+        <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+            <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Services</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>Open EMR</strong></li>
+                <li><strong>Select Services</strong></li>
+                <li><strong>Look for Mamogram service at clinical order</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for the clinic of doctor that requested</span></li>
+                <li><span style="color: greenyellow; font-weight: bold;">no need to check approval for Thiqa</span></li>
+
+            </ol>
+        </div>
+        
+        <!-- Step 2: Check Approval -->
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>From document: Check approval file near to service date</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for clinic</span></li>
+            </ol>
+        </div>
+
+        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+            <h5 style="color: #2e7d32; margin-top: 0;">⏱️ Session Information</h5>
+            <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Session Time: 60 minutes</p>
+        </div>
+
+
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">in case Mamogram + ultra sound</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><span style="color: #ff5e5e; font-weight: bold;">Don't book raise ticket</span></li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+<div class="info-section">
+    <input type="checkbox" id="ultra-sound">
+    <label for="ultra-service">🩺Ultra sound</label>
+    <div class="info-content">
+        <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+            <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Services</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>Open EMR</strong></li>
+                <li><strong>Select Services</strong></li>
+                <li><strong>Look for Mamogram service at clinical order</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for the clinic of doctor that requested</span></li>
+                <li><span style="color: greenyellow; font-weight: bold;">no need to check approval for Thiqa</span></li>
+
+            </ol>
+        </div>
+        
+        <!-- Step 2: Check Approval -->
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Check Approval</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li><strong>From document: Check approval file near to service date</strong></li>
+                <li><span style="color: #ff5e5e; font-weight: bold;">If NOT found: Raise ticket for clinic</span></li>
+            </ol>
+        </div>
+
+        <!-- KUB -->
+        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 10px 0;">
+            <h5 style="color: #2e7d32; margin-top: 0;">KUB</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li>Drink 2 liters of water before the exam</li>
+                <li>No fasting needed</li>
+            </ol>
+        </div>
+
+        <!-- Abdominal -->
+        <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Abdominal</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li>Do not eat or drink for 4–8 hours before exam</li>
+            </ol>
+        </div>
+
+        <!-- Hepatobiliary -->
+        <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+            <h5 style="color: #1565c0; margin-top: 0;">Hepatobiliary (HIB)</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li>Drink water</li>
+                <li>No fasting required</li>
+            </ol>
+        </div>
+
+        <!-- TVS -->
+        <div style="background: #fff8e1; padding: 15px; border-radius: 8px; border-left: 4px solid #ffa000; margin: 10px 0;">
+            <h5 style="color: #e65100; margin-top: 0;">Transvaginal Ultrasound (TVS)</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li>For females (uterus/womb, ovaries)</li>
+                <li>Performed by female technician/radiologist</li>
+                <li>Check DDS</li>
+
+            </ol>
+        </div>
+
+        <!-- Scrotal -->
+        <div style="background: #ede7f6; padding: 15px; border-radius: 8px; border-left: 4px solid #7b1fa2; margin: 10px 0;">
+            <h5 style="color: #4a148c; margin-top: 0;">Scrotal Ultrasound</h5>
+            <ol style="margin: 10px 0; line-height: 1.6;">
+                <li>For males (testicles/scrotum)</li>
+                <li>Performed by male technician/radiologist</li>
+                <li>Check DDS</li>
+
+            </ol>
+        </div>
+
+        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+            <h5 style="color: #2e7d32; margin-top: 0;">⏱️ Session Information</h5>
+            <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Session Time: 30-60 minutes</p>
+        </div>
+
+        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 15px 0;">
+            <h5 style="color: #2e7d32; margin-top: 0;">⏱️ Notes</h5>
+            <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Machine 1 for comblex cases /2 for simple</p>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- don't delete here below-->
+
+
+            </div>
+        </div>
+        <div class="info-section">
+            <input type="checkbox" id="bmc-physiotherapy">
+            <label for="bmc-physiotherapy">🏃 Physiotherapy</label>
+            <div class="info-content">
+        
+                <!-- Step 1 -->
+                <div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 10px 0;">
+                    <h5 style="color: #1565c0; margin-top: 0;">Step 1: Check Excel Sheet</h5>
+                    <p>Look for patient in the physiotherapy Excel list.</p>
+                </div>
+        
+                <!-- Step 2 -->
+                <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+                    <h5 style="color: #d32f2f; margin-top: 0;">Step 2: Not Found in Excel</h5>
+                    <ol style="margin: 10px 0; line-height: 1.6;">
+                        <li>Check the call center sheet</li>
+                        <li>If still not found, check for referral in the Clinical Order</li>
+                        <li>If referral found → Request to add in call center sheet</li>
+                        <li>If referral not found → Raise ticket for the doctor’s clinic</li>
+                    </ol>
+                </div>
+        
+                <!-- Step 3 -->
+                <div style="background: #fff8e1; padding: 15px; border-radius: 8px; border-left: 4px solid #ffa000; margin: 10px 0;">
+                    <h5 style="color: #e65100; margin-top: 0;">Step 3: Add EV Thiqa Comment</h5>
+                    <p>Fill details to generate the comment in the format:</p>
+                    <p><strong>EV thiqa GD1234 1/6 13 SEP</strong> (approval condition / gd role of doctor / current session / total session / SEP is month)</p>
+                    
+                    <!-- Inputs for comment generation -->
+                    <input type="text" id="physioApproval" placeholder="Approval condition" style="margin: 5px; padding: 5px;">
+                    <input type="text" id="physioGD" placeholder="GD Role/Doctor Code" style="margin: 5px; padding: 5px;">
+                    <input type="number" id="physioCurrentSession" placeholder="Current Session" style="margin: 5px; padding: 5px; width: 100px;">
+                    <input type="number" id="physioTotalSession" placeholder="Total Session" style="margin: 5px; padding: 5px; width: 100px;">
+                    <input type="text" id="physioMonth" placeholder="Month (e.g., SEP)" style="margin: 5px; padding: 5px; width: 120px;">
+                    <button onclick="generatePhysioComment()" style="background: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 5px;">Generate</button>
+                    
+                    <div id="physioCommentResult" style="margin-top: 10px; font-weight: bold; color: #1565c0;"></div>
+                </div>
+        
+                <!-- Step 4 -->
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 10px 0;">
+                    <h5 style="color: #2e7d32; margin-top: 0;">Step 4: Book the Appointment</h5>
+                    <p>Once all checks are completed and comment is ready, proceed to book the physiotherapy session.</p>
+                </div>
+        
+            </div>
+        </div>
+        <div class="info-section">
+            <input type="checkbox" id="bmc-clinics">
+            <label for="bmc-clinics">🏥 Clinics</label>
+            <div class="info-content">
+        
+                <!-- Ticket Cases -->
+                <div style="background: #fff3f3; padding: 15px; border-radius: 8px; border-left: 4px solid #ff5e5e; margin: 10px 0;">
+                    <h5 style="color: #d32f2f; margin-top: 0;">🎫 Ticket Cases</h5>
+                    <ul style="margin: 10px 0; line-height: 1.6;">
+                        <li><strong>KB(bariatric surgery)</strong> → Service Not found → Raise ticket</li>
+                        <li><strong>Nuclear Medicine</strong> → Raise ticket</li>
+                        <li><strong>IVF</strong> → Raise ticket</li>
+                        <li><strong>Paley Clinic</strong> → Raise ticket for <em>doctor Paley only</em></li>
+                    </ul>
+                </div>
+        
+                <!-- Book Cases -->
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50; margin: 10px 0;">
+                    <h5 style="color: #2e7d32; margin-top: 0;">📅 Book Cases</h5>
+                    <ul style="margin: 10px 0; line-height: 1.6;">
+                        <li><strong>Breast Clinic</strong> → Book</li>
+                        <li><strong>Infection Disease</strong> → Book</li>
+                        <li><strong>Palliative Care</strong> → Book at Pain Management</li>
+                        <li><strong>Rehabilitation</strong> → Book</li>
+                        <li><strong>Oral Maxillofacial</strong> → Book Dr. Thomas</li>
+                        <li><strong>Cardiothoracic Surgery</strong> → Book</li>
+                        <li><strong>Humaid El Shamsi Oncology</strong> → Book</li>
+                    </ul>
+                </div>
+        
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="dubai-sidebar" id="dubai-sidebar">
+        <h2>Dubai Information</h2>
+        <div class="info-section">
+            <p><strong>Dubai Healthcare Information:</strong></p>
+            <p>This is placeholder content for Dubai healthcare information. You can add specific details about:</p>
+            <ul>
+                <li>Dubai Health Authority (DHA) procedures</li>
+                <li>Dubai healthcare facilities</li>
+                <li>Insurance requirements</li>
+                <li>Medical tourism information</li>
+                <li>Emergency services</li>
+            </ul>
+            <p>Add your specific Dubai information here when ready.</p>
+        </div>
+    </div>
+
     <div class="section section-1">
         <h2>Calls & Appointments</h2>
         <div class="counter-section">
@@ -426,6 +1315,8 @@
 
         </div>
     </div>
+
+
 
     <div class="section ">
         <h2>Tricks Reminder</h2>
@@ -604,6 +1495,122 @@
             calculateResult();
 
             alert('Counters reset! You’re starting fresh. 🚀');
+        }
+
+        function openBMC() {
+            const bmcSidebar = document.getElementById('bmc-sidebar');
+            bmcSidebar.classList.toggle('open');
+        }
+
+        function openDubai() {
+            const dubaiSidebar = document.getElementById('dubai-sidebar');
+            dubaiSidebar.classList.toggle('open');
+        }
+
+        function toggleDentalDoctors() {
+            const dentalCheckbox = document.getElementById('main-dental-checkbox');
+            const doctorsSection = document.getElementById('dental-doctors-section');
+
+            if (dentalCheckbox.checked) {
+                doctorsSection.style.display = 'block';
+            } else {
+                doctorsSection.style.display = 'none';
+                // Reset all doctor checkboxes and important notes when hiding
+                const allCheckboxes = ['dr-thomas', 'dr-tahir', 'dr-zeinab-wael', 'dr-wujood', 'dental-important-notes'];
+                allCheckboxes.forEach(id => {
+                    const checkbox = document.getElementById(id);
+                    if (checkbox) checkbox.checked = false;
+                });
+            }
+        }
+
+        function toggleRadiologyServices() {
+            const radiologyCheckbox = document.getElementById('bmc-radiology');
+            const servicesSection = document.getElementById('radiology-services-section');
+
+            if (radiologyCheckbox.checked) {
+                servicesSection.style.display = 'block';
+            } else {
+                servicesSection.style.display = 'none';
+                // Reset all radiology service checkboxes when hiding
+                const radiologyCheckboxes = ['mri-service'];
+                radiologyCheckboxes.forEach(id => {
+                    const checkbox = document.getElementById(id);
+                    if (checkbox) checkbox.checked = false;
+                });
+            }
+        }
+
+        function generatePhysioComment() {
+    const approval = document.getElementById('physioApproval').value.trim();
+    const gd = document.getElementById('physioGD').value.trim();
+    const current = document.getElementById('physioCurrentSession').value.trim();
+    const total = document.getElementById('physioTotalSession').value.trim();
+    const month = document.getElementById('physioMonth').value.trim().toUpperCase();
+
+    if (!approval || !gd || !current || !total || !month) {
+        document.getElementById('physioCommentResult').innerHTML = "<span style='color:red;'>Please fill all fields</span>";
+        return;
+    }
+
+    const comment = `EV thiqa ${approval} ${gd} ${current}/${total} 13 ${month}`;
+    document.getElementById('physioCommentResult').textContent = comment;
+}
+
+        function showDoctorInfo(caseType) {
+            const recommendationDiv = document.getElementById('doctor-recommendation');
+            const contentDiv = document.getElementById('recommendation-content');
+
+            let content = '';
+
+            switch (caseType) {
+                case 'maxillofacial':
+                    content = `
+                        <div style="border-left: 4px solid #4CAF50; padding-left: 15px; margin: 10px 0;">
+                            <h6 style="color: #2c3e50; margin: 5px 0;">Dr. Thomas George Arayathinal</h6>
+                            <p style="margin: 3px 0; font-size: 14px;">❌ NO OVERBOOKING | ✅ Max 2 surgeries/day</p>
+                            <p style="margin: 3px 0; font-size: 14px; color: #ffa500;">⚠️ Urgent: Send ticket with "NEED APP"</p>
+                        </div>
+                        <div style="border-left: 4px solid #4CAF50; padding-left: 15px; margin: 10px 0;">
+                            <h6 style="color: #2c3e50; margin: 5px 0;">Dr. Tahir Mirza</h6>
+                            <p style="margin: 3px 0; font-size: 14px;">❌ NO OVERBOOKING | ✅ Walk-ins: Send ticket</p>
+                        </div>
+                    `;
+                    break;
+                case 'general':
+                    content = `
+                        <div style="border-left: 4px solid #4CAF50; padding-left: 15px; margin: 10px 0;">
+                            <h6 style="color: #2c3e50; margin: 5px 0;">Zeinab / Wael</h6>
+                            <p style="margin: 3px 0; font-size: 14px;">✅ Whitening | ✅ Cleaning | ✅ General procedures</p>
+                            <p style="margin: 3px 0; font-size: 14px;">✅ Check-ups | ✅ Preventive care</p>
+                        </div>
+                    `;
+                    break;
+                case 'orthodontics':
+                    content = `
+                        <div style="border-left: 4px solid #4CAF50; padding-left: 15px; margin: 10px 0;">
+                            <h6 style="color: #2c3e50; margin: 5px 0;">Wujood Ahmad Bakhid Ahmad Alfalasi</h6>
+                            <p style="margin: 3px 0; font-size: 14px;">✅ Orthodontics ONLY | ✅ Braces consultation</p>
+                            <p style="margin: 3px 0; font-size: 14px;">✅ Teeth alignment | ✅ Orthodontic follow-ups</p>
+                        </div>
+                    `;
+                    break;
+                case 'urgent':
+                    content = `
+                        <div style="border-left: 4px solid #ff5e5e; padding-left: 15px; margin: 10px 0; background: #ffe6e6; border-radius: 8px; padding: 10px;">
+                            <h6 style="color: #d32f2f; margin: 5px 0;">🚨 URGENT CASES PROTOCOL</h6>
+                            <p style="margin: 3px 0; font-size: 14px; color: #d32f2f;"><strong>Dr. Thomas George Arayathinal:</strong></p>
+                            <p style="margin: 3px 0; font-size: 14px;">Send ticket to clinic with remark: <strong>"NEED APP"</strong></p>
+                            <hr style="border-color: #ff5e5e; margin: 10px 0;">
+                            <p style="margin: 3px 0; font-size: 14px; color: #d32f2f;"><strong>Dr. Tahir Mirza:</strong></p>
+                            <p style="margin: 3px 0; font-size: 14px;">Walk-in option available - send ticket to clinic</p>
+                        </div>
+                    `;
+                    break;
+            }
+
+            contentDiv.innerHTML = content;
+            recommendationDiv.style.display = 'block';
         }
 
 
