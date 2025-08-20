@@ -6,6 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calls and Appointments Tracker</title>
     <style>
+
+.appointment-sidebar {
+    position: fixed;
+    top: 0;
+    left: -100vw;  /* hidden by default */
+    width: 42rem;
+    height: 100%;
+    background: #f0f0f0;
+    transition: all 0.3s;
+    overflow-y: auto;
+    color: black;
+    z-index: 9;
+}
+.appointment-sidebar.open {
+    left: 0; /* slide in */
+}
+
+.appointment-toggle {
+    position: fixed;
+    top: 87px;  
+    left: 10px;
+    z-index: 1000;
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+div#appointment-sidebar p {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: crimson;
+}
+
+
+
        div#bmc-sidebar >.info-section {
             border-bottom: 1px solid black;
             padding: 1rem;
@@ -463,11 +500,14 @@
     <div id="restore-button" onclick="resetCounters()">Restore</div>
 
     <button class="sidebar-toggle" onclick="toggleSidebar()">☰ History</button>
-    <div class="buttons-container">
-        <button class="info-sidebar-toggle" onclick="toggleInfoSidebar()">☰ Info</button>
-        <button class="bmc-button" onclick="openBMC()"> Bmc </button>
-        <button class="dubai-button" onclick="openDubai()">Dubai</button>
-    </div>
+    <button class="appointment-toggle" onclick="toggleAppointmentSidebar()">☰ Appointment Rate</button>
+
+ <div class="buttons-container">
+    <button class="info-sidebar-toggle" onclick="toggleInfoSidebar()">☰ Info</button>
+    <button class="bmc-button" onclick="openBMC()">Bmc</button>
+    <button class="dubai-button" onclick="openDubai()">Dubai</button>
+</div>
+
 
 
     <div class="sidebar" id="sidebar">
@@ -476,6 +516,85 @@
         <div id="history-list"></div>
         <div class="total" id="total-result"></div>
     </div>
+
+
+    <div class="appointment-sidebar" id="appointment-sidebar">
+    <h2>Appointment Rate Tips</h2>
+
+    <div class="info-section">
+        <input type="checkbox" id="available-app">
+        <label for="available-app">📅 Available Appointment</label>
+        <div class="info-content">
+            <p><strong>Tips:</strong> Offer earliest slot first, give 2 options, use urgency (“slots fill quickly”).</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="unavailable-app">
+        <label for="unavailable-app">⏳ Unavailable Appointment → Replacement</label>
+        <div class="info-content">
+            <p>Say: “That slot is full, but I have another option.” Book as placeholder.</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="lab-report">
+        <label for="lab-report">🧪 Lab Report Cases</label>
+        <div class="info-content">
+            <p>Reframe as consultation: “Doctor must review results with you personally—let’s book so treatment isn’t delayed.”</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="radiology">
+        <label for="radiology">🩻 Radiology (Approval Pending)</label>
+        <div class="info-content">
+            <p>“Better to secure slot now so you don’t wait after approval.”</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="transfer">
+        <label for="transfer">🔄 Transfers (Dental/Physio/Language)</label>
+        <div class="info-content">
+            <p>Tag as non-bookable. Don’t let them inflate denominator unfairly.</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="walk-in">
+        <label for="walk-in">🚶 Walk-ins</label>
+        <div class="info-content">
+            <p>“Let’s book the earliest slot as backup—even if you walk in, you don’t lose it.”</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="inquiries">
+        <label for="inquiries">❓ Inquiries</label>
+        <div class="info-content">
+            <p>“Clinic opens 9 AM, let me book you then so you won’t wait.”</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="callback">
+        <label for="callback">📞 Callback Requests</label>
+        <div class="info-content">
+            <p>“I’ll arrange a callback, but let’s secure a slot now since they fill quickly.”</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <input type="checkbox" id="silent-calls">
+        <label for="silent-calls">🔇 Silent / Dropped Calls</label>
+        <div class="info-content">
+            <p>Track separately. Log as ‘non-bookable’ to show real KPI vs system KPI.</p>
+        </div>
+    </div>
+</div>
+
+
 
     <div class="info-sidebar" id="info-sidebar">
         <h2>Booking Information</h2>
@@ -1288,6 +1407,7 @@
         </div>
     </div>
 
+
     <div class="section section-1">
         <h2>Calls & Appointments</h2>
         <div class="counter-section">
@@ -1612,6 +1732,11 @@
             contentDiv.innerHTML = content;
             recommendationDiv.style.display = 'block';
         }
+
+function toggleAppointmentSidebar() {
+    const sidebar = document.getElementById('appointment-sidebar');
+    sidebar.classList.toggle('open');
+}
 
 
     </script>
